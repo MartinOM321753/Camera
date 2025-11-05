@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Cámara PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        #cameraContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        video {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        @media screen and (max-width: 767px) {
+            button {
+                width: 80%;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media screen and (min-width: 768px) {
+            button {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="cameraContainer">
+        <button id="openCamera">Abrir Cámara</button>
+        <div id="cameraStream" style="display:none;">
+            <video id="video" autoplay></video>
+            <button id="takePhoto">Tomar Foto</button>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
