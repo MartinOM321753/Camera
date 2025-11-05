@@ -44,7 +44,7 @@ function takePhoto() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Convertir el canvas a Data URL (imagen base64)
-    const imageDataURL = canvas.toDataURL('image/png');
+    const imageDataURL = canvas.toDataURL('./image/png');
     console.log('Foto capturada en base64:', imageDataURL.length, 'caracteres');
 
     // Cerrar la cámara
