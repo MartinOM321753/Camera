@@ -3,32 +3,35 @@ const openCameraBtn = document.getElementById('openCamera');
 const cameraStream = document.getElementById('cameraStream');
 const video = document.getElementById('video');
 const takePhotoBtn = document.getElementById('takePhoto');
+const switchCameraBtn = document.getElementById('switchCamera');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let stream = null;
+let useFrontCamera = false; // false = trasera, true = frontal
 
 // Función para abrir la cámara
 async function openCamera() {
     try {
         const constraints = {
             video: {
-                facingMode: { ideal: 'environment' },
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                facingMode: useFrontCamera ? 'user' : 'environment',
+                width: { ideal: 220 },
+                height: { ideal: 240 }
             }
         };
+
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
 
         cameraStream.style.display = 'block';
-        canvas.style.display = 'none'; // Ocultar el canvas al abrir cámara
+        canvas.style.display = 'none';
         video.style.display = 'block';
 
         openCameraBtn.textContent = 'Cámara Abierta';
         openCameraBtn.disabled = true;
 
-        console.log('Cámara abierta exitosamente');
+        console.log(`Cámara abierta (${useFrontCamera ? 'frontal' : 'trasera'})`);
     } catch (error) {
         console.error('Error al acceder a la cámara:', error);
         alert('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
@@ -42,22 +45,17 @@ function takePhoto() {
         return;
     }
 
-    // Ajustar el tamaño del canvas al video real
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = 220;
+    canvas.height = 240;
 
-    // Dibujar el frame actual
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Mostrar la foto capturada
     canvas.style.display = 'block';
     video.style.display = 'none';
 
-    // Convertir a imagen Base64
     const imageDataURL = canvas.toDataURL('image/png');
     console.log('Foto capturada:', imageDataURL.substring(0, 50) + '...');
 
-    // Cerrar la cámara
     closeCamera();
 }
 
@@ -74,7 +72,15 @@ function closeCamera() {
     }
 }
 
+// Función para cambiar entre cámaras
+async function switchCamera() {
+    useFrontCamera = !useFrontCamera;
+    closeCamera(); // Detiene la cámara actual
+    await openCamera(); // Vuelve a abrir con el nuevo modo
+}
+
 // Eventos
 openCameraBtn.addEventListener('click', openCamera);
 takePhotoBtn.addEventListener('click', takePhoto);
+switchCameraBtn.addEventListener('click', switchCamera);
 window.addEventListener('beforeunload', closeCamera);

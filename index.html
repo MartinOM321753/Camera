@@ -31,7 +31,7 @@
         canvas {
             width: 220px;
             /* Tamaño fijo */
-            height: 140px;
+            height: 240px;
             /* Tamaño fijo */
             border: 2px solid #ccc;
             border-radius: 8px;
@@ -58,7 +58,7 @@
 
             video,
             canvas {
-                width: 220px;
+                width: 240px;
                 height: 180px;
             }
 
@@ -73,10 +73,14 @@
 <body>
     <div id="cameraContainer">
         <button id="openCamera">Abrir Cámara</button>
-        <div id="cameraStream" >
+        <div id="cameraStream" style="display:none;">
             <video id="video" autoplay></video>
-            <button id="takePhoto">Tomar Foto</button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button id="takePhoto">Tomar Foto</button>
+                <button id="switchCamera">Voltear Cámara</button>
+            </div>
         </div>
+
         <canvas id="canvas"></canvas>
     </div>
     <script src="./app.js"></script>
