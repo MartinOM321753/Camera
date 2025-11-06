@@ -1,104 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="theme-color" content="#000000">
-    <title>Cámara PWA</title>
-    <link rel="manifest" href="./manifest.json">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <title>Cámara PWA</title>
+  <link rel="manifest" href="./manifest.json">
 
-        #cameraContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        video,
-        canvas {
-            width: 220px;
-            /* Tamaño fijo */
-            height: 240px;
-            /* Tamaño fijo */
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            object-fit: cover;
-            /* Evita distorsión */
-            background-color: #000;
-        }
+    #cameraContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-        button {
-            padding: 12px 24px;
-            font-size: 1.1rem;
-            background-color: #007BFF;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+    video, canvas {
+      width: 220px;
+      height: 240px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      object-fit: cover;
+      background-color: #000;
+    }
 
-        button:disabled {
-            background-color: #ccc;
-        }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-        @media screen and (max-width: 220px) {
+    button:disabled {
+      background-color: #ccc;
+    }
 
-            video,
-            canvas {
-                width: 240px;
-                height: 180px;
-            }
+    /* Galería de fotos */
+    #galleryContainer {
+      width: 100%;
+      overflow-x: auto;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+      border-top: 1px solid #ccc;
+      background-color: #fff;
+    }
 
-            button {
-                width: 80%;
-            }
-        }
-    </style>
+    #galleryContainer img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      transition: transform 0.2s ease;
+    }
 
+    #galleryContainer img:hover {
+      transform: scale(1.05);
+      border-color: #007BFF;
+    }
+
+    /* Modal para visualizar imagen */
+    #imageModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #imageModal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+  </style>
 </head>
 
 <body>
-    <div id="cameraContainer">
-        <button id="openCamera">Abrir Cámara</button>
-        <div id="cameraStream" style="display:none;">
-            <video id="video" autoplay></video>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button id="takePhoto">Tomar Foto</button>
-                <button id="switchCamera">Voltear Cámara</button>
-            </div>
-        </div>
-
-        <canvas id="canvas"></canvas>
+  <div id="cameraContainer">
+    <button id="openCamera">Abrir Cámara</button>
+    <div id="cameraStream" style="display:none;">
+      <video id="video" autoplay></video>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="takePhoto">Tomar Foto</button>
+        <button id="switchCamera">Voltear Cámara</button>
+      </div>
     </div>
-    <script src="./app.js"></script>
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
 
-    <script>
-        // Registro del Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registrado con éxito:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Error al registrar el Service Worker:', error);
-                    });
-            });
-        }
-    </script>
+  <!-- Galería -->
+  <div id="galleryContainer"></div>
+
+  <!-- Modal para visualizar imagen -->
+  <div id="imageModal">
+    <img id="modalImage" src="" alt="Foto ampliada">
+  </div>
+
+  <script src="./app.js"></script>
+
+  <script>
+    // Registro del Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('Service Worker registrado con éxito:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Error al registrar el Service Worker:', error);
+          });
+      });
+    }
+  </script>
 </body>
-
 </html>
