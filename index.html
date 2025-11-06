@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -12,56 +13,63 @@
             margin: 0;
             padding: 0;
             background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         #cameraContainer {
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
-            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
 
-        video {
-            max-width: 100%;
-            height: auto;
+        video,
+        canvas {
+            width: 320px;
+            /* Tamaño fijo */
+            height: 240px;
+            /* Tamaño fijo */
             border: 2px solid #ccc;
             border-radius: 8px;
+            object-fit: cover;
+            /* Evita distorsión */
+            background-color: #000;
         }
 
         button {
-            padding: 15px 25px;
-            font-size: 1.2rem;
+            padding: 12px 24px;
+            font-size: 1.1rem;
             background-color: #007BFF;
             border: none;
             color: white;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 20px;
         }
 
         button:disabled {
             background-color: #ccc;
         }
 
-        canvas {
-            display: none;
-        }
+        @media screen and (max-width: 480px) {
 
-        @media screen and (max-width: 767px) {
+            video,
+            canvas {
+                width: 240px;
+                height: 180px;
+            }
+
             button {
                 width: 80%;
-                font-size: 1.2rem;
-            }
-        }
-
-        @media screen and (min-width: 768px) {
-            button {
-                font-size: 1.5rem;
             }
         }
     </style>
+
 </head>
+
 <body>
     <div id="cameraContainer">
         <button id="openCamera">Abrir Cámara</button>
@@ -88,4 +96,5 @@
         }
     </script>
 </body>
+
 </html>
