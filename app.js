@@ -4,9 +4,9 @@ const cameraStream = document.getElementById('cameraStream');
 const video = document.getElementById('video');
 const takePhotoBtn = document.getElementById('takePhoto');
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d'); // Contexto 2D para dibujar en el Canvas
+const ctx = canvas.getContext('2d');
 
-let stream = null; // Variable para almacenar el MediaStream de la cámara
+let stream = null;
 
 // Función para abrir la cámara
 async function openCamera() {
@@ -14,15 +14,17 @@ async function openCamera() {
         const constraints = {
             video: {
                 facingMode: { ideal: 'environment' },
-                width: { ideal: 320 },
-                height: { ideal: 240 }
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
 
-        // Mostrar el streaming de la cámara
         cameraStream.style.display = 'block';
+        canvas.style.display = 'none'; // Ocultar el canvas al abrir cámara
+        video.style.display = 'block';
+
         openCameraBtn.textContent = 'Cámara Abierta';
         openCameraBtn.disabled = true;
 
@@ -40,44 +42,39 @@ function takePhoto() {
         return;
     }
 
-    // Dibujar el frame de video en el canvas
+    // Ajustar el tamaño del canvas al video real
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Dibujar el frame actual
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convertir el canvas a Data URL (imagen base64)
-    const imageDataURL = canvas.toDataURL('/image/png');
-    console.log('Foto capturada en base64:', imageDataURL.length, 'caracteres');
+    // Mostrar la foto capturada
+    canvas.style.display = 'block';
+    video.style.display = 'none';
+
+    // Convertir a imagen Base64
+    const imageDataURL = canvas.toDataURL('image/png');
+    console.log('Foto capturada:', imageDataURL.substring(0, 50) + '...');
 
     // Cerrar la cámara
     closeCamera();
 }
 
-// Función para cerrar la cámara y liberar recursos
+// Función para cerrar la cámara
 function closeCamera() {
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
-        stream = null; // Limpiar la referencia
-
+        stream = null;
         video.srcObject = null;
         cameraStream.style.display = 'none';
         openCameraBtn.textContent = 'Abrir Cámara';
         openCameraBtn.disabled = false;
-
         console.log('Cámara cerrada');
     }
-}
-
-// Ajustar el tamaño del canvas al tamaño del video
-function adjustCanvasSize() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
 }
 
 // Eventos
 openCameraBtn.addEventListener('click', openCamera);
 takePhotoBtn.addEventListener('click', takePhoto);
-video.addEventListener('loadedmetadata', adjustCanvasSize);
-
-// Limpiar el stream cuando el usuario cierra la página
-window.addEventListener('beforeunload', () => {
-    closeCamera();
-});
+window.addEventListener('beforeunload', closeCamera);
