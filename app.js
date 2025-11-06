@@ -20,7 +20,7 @@ async function openCamera() {
     const constraints = {
       video: {
         facingMode: useFrontCamera ? 'user' : 'environment',
-        width: { ideal: 220 },
+        width: { ideal: 320 },
         height: { ideal: 240 }
       }
     };
@@ -49,7 +49,7 @@ function takePhoto() {
     return;
   }
 
-  canvas.width = 220;
+  canvas.width = 320;
   canvas.height = 240;
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
